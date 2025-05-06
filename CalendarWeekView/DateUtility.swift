@@ -47,6 +47,11 @@ class DateUtility {
         case monthDay = "MMMM d"
     }
     
+    struct Week: Identifiable {
+        let id = UUID()
+        let week: [WeekDay]
+    }
+    
     struct WeekDay: Identifiable {
         let id = UUID()
         let date: Date
@@ -54,9 +59,9 @@ class DateUtility {
         let dayString: String
     }
     
-    func getWeekDates(withDateFormat dateFormat: DateFormatType, andDayFormat dayFormat: DateFormatType) -> [WeekDay] {
+    func getWeekDates(forDate date: Date, withDateFormat dateFormat: DateFormatType = .day, andDayFormat dayFormat: DateFormatType = .shortDayOfWeek) -> [WeekDay] {
         let calendar = Calendar.current
-        let today = Date()
+        let today = date
         let weekday = calendar.component(.weekday, from: today)
         
         // Calculate the start of the week (assuming week starts on Sunday)
@@ -79,5 +84,28 @@ class DateUtility {
             }
             return nil
         }
+    }
+    
+    func generateWeeks(around baseDate: Date) -> [[DateUtility.WeekDay]]  {
+        let calendar = Calendar.current
+        let range = -260...260
+
+        var generatedWeeks: [[DateUtility.WeekDay]] = []
+
+        for offset in range {
+            if let offsetDate = calendar.date(byAdding: .weekOfYear, value: offset, to: baseDate),
+               let startOfWeek = calendar.startOfWeek(for: offsetDate) {
+                let week = DateUtility.shared.getWeekDates(forDate: startOfWeek)
+                generatedWeeks.append(week)
+            }
+        }
+
+        return generatedWeeks
+    }
+}
+
+extension Calendar {
+    func startOfWeek(for date: Date) -> Date? {
+        dateInterval(of: .weekOfYear, for: date)?.start
     }
 }

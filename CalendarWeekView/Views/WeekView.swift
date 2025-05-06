@@ -8,19 +8,22 @@
 import SwiftUI
 
 struct WeekView: View {
-    
-    let weekDays = DateUtility.shared.getWeekDates(withDateFormat: .day, andDayFormat: .shortDayOfWeek)
+    @State var selectedDate: Date
     
     var body: some View {
+        
+        let weekDays = DateUtility.shared.getWeekDates(forDate: selectedDate)
+        
         HStack {
             ForEach(weekDays) { day in
                 
                 DayView(date: day.dateString, day: day.dayString)
             }
         }
+        .padding(4)
     }
 }
 
 #Preview {
-    WeekView()
+    WeekView(selectedDate: Date())
 }
